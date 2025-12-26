@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anurag OS | Secure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        :root { 
+            --primary: #00f2ff; 
+            --bg-filter: brightness(0.5) contrast(1.2); 
+            --dropdown-bg: rgba(0, 0, 0, 0.9);
+            --text-color: #ffffff;
+            --bg-url: url('https://wallpapercave.com/wp/wp2752752.jpg');
+        }
+
+        body.day-mode { 
+            --primary: #0066ff; 
+            --bg-filter: brightness(1.1) grayscale(0.2); 
+            --dropdown-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #000000;
+            --bg-url: url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=2070&auto=format&fit=crop');
+        }
+
+        body { 
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            background: #000; font-family: 'Orbitron', sans-serif; 
+            overflow: hidden; color: var(--text-color); transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+        }
+
+        /* --- Animations --- */
+        @keyframes systemFadeIn {
+            from { opacity: 0; transform: scale(1.05); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Auth Overlay --- */
+        #auth-overlay {
+            position: fixed; inset: 0; z-index: 9000;
+            background: var(--bg-url) center/cover;
+            display: flex; justify-content: center; align-items: center; 
+            backdrop-filter: blur(10px);
+            transition: 0.8s ease-in-out;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(0, 0, 0, 0.85); padding: 30px; border-radius: 15px;
+            border: 1px solid var(--primary); width: 100%; max-width: 350px; 
+            text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            animation: cardEntrance 0.6s ease-out;
+        }
+
+        .auth-card input {
+            width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px;
+            border: 1px solid #333; background: rgba(255,255,255,0.05);
+            color: var(--text-color); font-family: 'Orbitron'; box-sizing: border-box;
+            font-size: 14px; transition: 0.3s; outline: none;
+        }
+        
+        .auth-card input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+
+        .auth-btn {
+            width: 100%; padding: 14px; background: var(--primary); color: white;
+            border: none; border-radius: 8px; cursor: pointer; font-family: 'Orbitron';
+            font-weight: bold; margin-top: 10px; transition: 0.3s;
+        }
+
+        .auth-link { cursor: pointer; font-size: 11px; margin-top: 12px; display: inline-block; color: var(--primary); opacity: 0.8; }
+        .auth-link:hover { opacity: 1; text-decoration: underline; }
+
+        /* --- OS UI Layout --- */
+        #os-content { 
+            display: none; flex: 1; flex-direction: column; 
+            animation: systemFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .bg-layer { 
+            position: fixed; inset: 0; background: var(--bg-url) center/cover; 
+            filter: var(--bg-filter); z-index: -1; transition: 1s ease;
+        }
+
+        nav { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .logo { font-size: 1.2rem; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); cursor: pointer; object-fit: cover; }
+
+        #home-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        #clock { font-size: clamp(3rem, 15vw, 6rem); font-weight: 700; color: var(--primary); text-shadow: 0 0 15px rgba(0,242,255,0.4); }
+        #date { font-size: clamp(0.8rem, 3vw, 1.2rem); letter-spacing: 3px; opacity: 0.8; margin-bottom: 30px; }
+        
+        .search-box { 
+            width: 90%; max-width: 600px; padding: 15px 25px; border-radius: 50px; 
+            background: rgba(0, 0, 0, 0.5); border: 1px solid var(--primary); 
+            color: white; text-align: center; font-family: 'Orbitron';
+            backdrop-filter: blur(10px); outline: none; transition: 0.4s; font-size: 1rem;
+        }
+
+        .profile-dropdown { 
+            position: absolute; top: 75px; right: 20px; background: var(--dropdown-bg); 
+            border: 1px solid var(--primary); border-radius: 12px; width: 250px; 
+            display: none; flex-direction: column; z-index: 1000; overflow: hidden;
+        }
+
+        #rating-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--dropdown-bg); border: 2px solid var(--primary); padding: 25px; 
+            display: none; text-align: center; z-index: 9999; border-radius: 20px; width: 85%; max-width: 400px;
+        }
+
+        @media (max-width: 768px) {
+            nav { height: 60px; }
+            .profile-dropdown { width: 80%; left: 50%; transform: translateX(-50%); top: 80px; }
+        }
+
+        .shutdown-active { filter: brightness(0) blur(20px); transform: scale(0.9); pointer-events: none; }
+    </style>
+</head>
+<body id="main-body">
+
+    <div id="auth-overlay">
+        <div id="login-form" class="auth-card">
+            <h2 style="color:var(--primary)">SYSTEM ACCESS</h2>
+            <form onsubmit="event.preventDefault(); handleLogin();">
+                <input type="text" id="login-user" placeholder="USERNAME" required>
+                <input type="password" id="login-pass" placeholder="PASSWORD" required>
+                <button type="submit" class="auth-btn">AUTHORIZE</button>
+            </form>
+            <div style="display:flex; justify-content: space-between;">
+                <span class="auth-link" onclick="switchAuth('register')">NEW USER?</span>
+                <span class="auth-link" onclick="switchAuth('forgot')">FORGOT PASSWORD?</span>
+            </div>
+        </div>
+
+        <div id="register-form" class="auth-card" style="display:none;">
+            <h2 style="color:var(--primary)">NEW USER</h2>
+            <form onsubmit="event.preventDefault(); handleRegister();">
+                <input type="text" id="reg-user" placeholder="CREATE USERNAME" required>
+                <input type="password" id="reg-pass" placeholder="CREATE PASSWORD" required>
+                <button type="submit" class="auth-btn">REGISTER SYSTEM</button>
+            </form>
+            <span class="auth-link" onclick="switchAuth('login')">BACK TO TERMINAL</span>
+        </div>
+
+        <div id="forgot-form" class="auth-card" style="display:none;">
+            <h2 style="color:var(--primary)">RECOVERY</h2>
+            <p style="font-size:10px; color:gray; margin-bottom:15px;">ENTER USERNAME TO RETRIEVE KEY</p>
+            <form onsubmit="event.preventDefault(); handleForgot();">
+                <input type="text" id="forgot-user" placeholder="USERNAME" required>
+                <button type="submit" class="auth-btn" id="recover-btn">RECOVER ACCESS</button>
+            </form>
+            <span class="auth-link" onclick="switchAuth('login')">CANCEL RECOVERY</span>
+        </div>
+    </div>
+
+    <div id="os-content">
+        <div class="bg-layer"></div>
+        <nav>
+            <div class="logo" style="color:var(--primary); font-weight:bold; letter-spacing: 2px;">ANURAG OS</div>
+            <div class="profile-area">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar" onclick="toggleDropdown()">
+                <div id="profileDropdown" class="profile-dropdown">
+                    <div class="dropdown-item" style="padding:15px; background: rgba(0,242,255,0.1); font-weight: bold; border-bottom: 1px solid var(--primary);">
+                        ID: <span id="display-username" style="color: var(--primary);">GUEST</span>
+                    </div>
+                    <div class="dropdown-item" id="theme-toggle" onclick="toggleTheme()" style="padding:15px; cursor:pointer;">☀️ DAY MODE</div>
+                    <div class="dropdown-item" onclick="showRating()" style="padding:15px; cursor:pointer;">⭐ RATE EXPERIENCE</div>
+                    <div class="dropdown-item" onclick="logout()" style="padding:15px; cursor:pointer; color: #ff4b4b;">🚪 LOGOUT SYSTEM</div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="home-screen">
+            <div id="clock">00:00</div>
+            <div id="date">LOADING...</div>
+            <div class="search-container" style="width:100%; display:flex; justify-content:center;">
+                <form onsubmit="handleSearch(event)" style="width:100%; display:flex; justify-content:center;">
+                    <input type="text" id="searchInput" class="search-box" placeholder="Search Neural Net...">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="rating-modal">
+        <h3 style="color:white">FEEDBACK</h3>
+        <div class="stars" id="star-container" style="font-size:30px; color:#444; margin:20px 0;">
+            <span class="star" onclick="setStar(1)" style="cursor:pointer">★</span>
+            <span class="star" onclick="setStar(2)" style="cursor:pointer">★</span>
+            <span class="star" onclick="setStar(3)" style="cursor:pointer">★</span>
+            <span class="star" onclick="setStar(4)" style="cursor:pointer">★</span>
+            <span class="star" onclick="setStar(5)" style="cursor:pointer">★</span>
+        </div>
+        <button class="auth-btn" onclick="closeRating()">DISMISS</button>
+    </div>
+
+    <script>
+        const PUBLIC_KEY = "yVzqOuuD7h5ncFFRE";
+        const TEMPLATE_ID = "template_2ueoqrd";
+        const SERVICE_ID = "service_gq0a72l";
+
+        (function(){ emailjs.init(PUBLIC_KEY); })();
+
+        function typeUsername() {
+            const savedUser = localStorage.getItem('os_user');
+            const inputField = document.getElementById('login-user');
+            if (savedUser && inputField) {
+                inputField.value = "";
+                let i = 0;
+                const typingEffect = setInterval(() => {
+                    if (i < savedUser.length) {
+                        inputField.value += savedUser.charAt(i);
+                        i++;
+                    } else { clearInterval(typingEffect); }
+                }, 100);
+            }
+        }
+
+        function enterSystem() {
+            const overlay = document.getElementById('auth-overlay');
+            const osContent = document.getElementById('os-content');
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                osContent.style.display = 'flex';
+                document.getElementById('display-username').innerText = (localStorage.getItem('os_user') || "GUEST").toUpperCase();
+            }, 600);
+        }
+
+        function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            if(u === localStorage.getItem('os_user') && p === localStorage.getItem('os_pass')) {
+                localStorage.setItem('isLoggedIn', 'true');
+                enterSystem();
+            } else { alert("ACCESS DENIED"); }
+        }
+
+        function handleRegister() {
+            const u = document.getElementById('reg-user').value;
+            const p = document.getElementById('reg-pass').value;
+            if(u && p) {
+                localStorage.setItem('os_user', u);
+                localStorage.setItem('os_pass', p);
+                alert("Identity Registered.");
+                switchAuth('login');
+            }
+        }
+
+        function handleForgot() {
+            const user = document.getElementById('forgot-user').value;
+            const btn = document.getElementById('recover-btn');
+            const storedUser = localStorage.getItem('os_user');
+            const storedPass = localStorage.getItem('os_pass');
+
+            btn.innerText = "SCANNING...";
+            
+            setTimeout(() => {
+                if(user === storedUser) {
+                    alert("ACCESS KEY RECOVERED: " + storedPass);
+                    switchAuth('login');
+                } else {
+                    alert("USER NOT FOUND IN LOCAL DATABASE");
+                    btn.innerText = "RECOVER ACCESS";
+                }
+            }, 1500);
+        }
+
+        function logout() {
+            document.body.classList.add('shutdown-active');
+            localStorage.removeItem('isLoggedIn');
+            setTimeout(() => { location.reload(); }, 800);
+        }
+
+        function switchAuth(mode) {
+            document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
+            document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
+            if(mode === 'login') typeUsername();
+        }
+
+        function toggleDropdown() {
+            const dd = document.getElementById('profileDropdown');
+            dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            document.getElementById('date').innerText = now.toDateString().toUpperCase();
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const q = document.getElementById('searchInput').value;
+            if(q) window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_self");
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('day-mode');
+            document.getElementById('theme-toggle').innerText = document.body.classList.contains('day-mode') ? "🌙 DARK MODE" : "☀️ DAY MODE";
+        }
+
+        function showRating() { document.getElementById('rating-modal').style.display = 'block'; }
+        function closeRating() { document.getElementById('rating-modal').style.display = 'none'; }
+        
+        function setStar(num) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((s, i) => { i < num ? s.style.color = '#ff00f2' : s.style.color = '#444'; });
+            emailjs.send(SERVICE_ID, TEMPLATE_ID, { user_name: localStorage.getItem('os_user') || "Guest", rating_value: num + " Stars" })
+                .then(() => { alert("Feedback Transmitted."); closeRating(); });
+        }
+
+        window.onload = () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            if(localStorage.getItem('isLoggedIn') === 'true') enterSystem();
+            else typeUsername();
+        };
+
+        window.onclick = (e) => {
+            if (!e.target.closest('.profile-area')) document.getElementById('profileDropdown').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
