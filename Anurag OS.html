@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Anurag OS | Secure</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CCHE1ZKQX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CCHE1ZKQX');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        :root { 
+            --primary: #00f2ff; 
+            --bg-filter: brightness(0.5) contrast(1.2); 
+            --dropdown-bg: rgba(0, 0, 0, 0.9);
+            --text-color: #ffffff;
+            --bg-url: url('https://wallpapercave.com/wp/wp2752752.jpg');
+        }
+
+        body.day-mode { 
+            --primary: #0066ff; 
+            --bg-filter: brightness(1.1) grayscale(0.2); 
+            --dropdown-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #000000;
+            --bg-url: url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=2070&auto=format&fit=crop');
+        }
+
+        body { 
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            background: #000; font-family: 'Orbitron', sans-serif; 
+            overflow: hidden; color: var(--text-color); transition: 0.5s ease;
+        }
+
+        /* --- AUTH SCREENS --- */
+        #auth-overlay {
+            position: fixed; inset: 0; z-index: 9000;
+            background: var(--bg-url) center/cover;
+            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px);
+            transition: background 0.5s ease;
+        }
+
+        .auth-card {
+            background: rgba(0, 0, 0, 0.8); padding: 40px; border-radius: 15px;
+            border: 1px solid var(--primary); width: 320px; text-align: center;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+        }
+
+        body.day-mode .auth-card { background: rgba(255, 255, 255, 0.9); border-color: #0066ff; }
+        .auth-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 18px; }
+        .auth-card input {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px;
+            border: 1px solid #333; background: rgba(255,255,255,0.05);
+            color: var(--text-color); font-family: 'Orbitron'; box-sizing: border-box;
+        }
+
+        .auth-btn {
+            width: 100%; padding: 12px; background: var(--primary); color: white;
+            border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron';
+            font-weight: bold; margin-top: 10px; transition: 0.3s;
+        }
+        
+        .auth-btn:hover { box-shadow: 0 0 15px var(--primary); transform: translateY(-2px); }
+        .auth-link { font-size: 10px; margin-top: 15px; cursor: pointer; color: var(--primary); display: block; }
+
+        /* --- OS INTERFACE --- */
+        #os-content { display: none; height: 100vh; flex-direction: column; }
+        .bg-layer { 
+            position: fixed; inset: 0; 
+            background: var(--bg-url) center/cover; 
+            filter: var(--bg-filter); z-index: -1; transition: 1s ease;
+        }
+
+        nav { 
+            height: 70px; display: flex; justify-content: space-between; 
+            align-items: center; padding: 0 25px; z-index: 5000; 
+        }
+
+        /* --- 3D PROFILE EFFECT --- */
+        .profile-area {
+            perspective: 1000px; /* Essential for 3D */
+        }
+
+        .avatar { 
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); 
+            cursor: pointer; object-fit: cover; background: #222;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .avatar:hover {
+            transform: scale(1.3) rotateX(15deg) rotateY(-15deg) translateZ(30px);
+            box-shadow: 0 15px 25px rgba(0, 242, 255, 0.4), 0 0 15px var(--primary);
+        }
+
+        #home-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #clock { font-size: 80px; font-weight: 700; color: var(--primary); text-shadow: 0 0 10px rgba(0,242,255,0.3); }
+        #date { letter-spacing: 5px; opacity: 0.8; }
+        
+        .search-box { 
+            width: 90%; max-width: 500px; padding: 18px; border-radius: 50px; 
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--primary); 
+            color: white; text-align: center; margin-top: 40px; outline: none; font-family: 'Orbitron';
+            backdrop-filter: blur(5px);
+        }
+
+        body.day-mode .search-box { background: rgba(255,255,255,0.7); color: black; }
+
+        .profile-dropdown { 
+            position: absolute; top: 70px; right: 25px; background: var(--dropdown-bg); 
+            border: 1px solid var(--primary); border-radius: 8px; width: 220px; display: none; flex-direction: column; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .dropdown-item { padding: 15px; font-size: 11px; cursor: pointer; border-bottom: 1px solid rgba(128,128,128,0.2); }
+        .dropdown-item:hover { background: var(--primary); color: white; }
+
+        #rating-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--dropdown-bg); border: 2px solid var(--primary); padding: 30px; 
+            display: none; text-align: center; z-index: 9999; border-radius: 15px; backdrop-filter: blur(10px);
+        }
+        .stars { font-size: 30px; cursor: pointer; color: #444; margin: 15px 0; }
+        .star.active { color: #ff00f2; text-shadow: 0 0 10px #ff00f2; }
+    </style>
+</head>
+<body id="main-body">
+
+    <div id="auth-overlay">
+        <div id="login-form" class="auth-card">
+            <h2>SYSTEM ACCESS</h2>
+            <input type="text" id="login-user" placeholder="USERNAME">
+            <input type="password" id="login-pass" placeholder="PASSWORD">
+            <button class="auth-btn" onclick="handleLogin()">LOGIN</button>
+            <span class="auth-link" onclick="switchAuth('register')">NEW PILOT? REGISTER</span>
+            <span class="auth-link" onclick="switchAuth('forget')">FORGOT ACCESS CODE?</span>
+        </div>
+
+        <div id="register-form" class="auth-card" style="display:none;">
+            <h2>SECURE REGISTRATION</h2>
+            <input type="text" id="reg-user" placeholder="CREATE USERNAME">
+            <input type="password" id="reg-pass" placeholder="CREATE PASSWORD">
+            <button class="auth-btn" onclick="handleRegister()">CREATE IDENTITY</button>
+            <span class="auth-link" onclick="switchAuth('login')">ALREADY HAVE ACCESS?</span>
+        </div>
+
+        <div id="forget-form" class="auth-card" style="display:none;">
+            <h2>RECOVERY MODE</h2>
+            <p style="font-size: 10px; opacity: 0.7;">Enter Username to see password</p>
+            <input type="text" id="recover-user" placeholder="USERNAME">
+            <button class="auth-btn" onclick="handleRecovery()">RECOVER</button>
+            <span class="auth-link" onclick="switchAuth('login')">BACK TO LOGIN</span>
+        </div>
+    </div>
+
+    <div id="os-content">
+        <div class="bg-layer"></div>
+        <nav>
+            <div class="logo" style="color:var(--primary); font-weight:bold; letter-spacing: 2px;">ANURAG OS</div>
+            <div class="profile-area">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" id="userAvatar" class="avatar" onclick="toggleDropdown()">
+                <input type="file" id="avatarInput" style="display:none" accept="image/*" onchange="updateProfileImg(event)">
+                <div id="profileDropdown" class="profile-dropdown">
+                    <div style="padding:10px; font-size:9px; border-bottom:1px solid gray; opacity:0.6;">STREAM: G-1CCHE1ZKQX</div>
+                    <div class="dropdown-item" id="theme-toggle" onclick="toggleTheme()">☀️ DAY MODE</div>
+                    <div class="dropdown-item" onclick="document.getElementById('avatarInput').click()">📷 CHANGE PHOTO</div>
+                    <div class="dropdown-item" onclick="showRating()">⭐ RATE EXPERIENCE</div>
+                    <div class="dropdown-item" onclick="logout()" style="color: #ff4b4b;">🚪 LOGOUT</div>
+                </div>
+            </div>
+        </nav>
+
+        <div id="home-screen">
+            <div id="clock">00:00pm</div>
+            <div id="date">LOADING...</div>
+            <form onsubmit="handleSearch(event)">
+                <input type="text" id="searchInput" class="search-box" placeholder="HOLO-SEARCH ACTIVE...">
+            </form>
+        </div>
+    </div>
+
+    <div id="rating-modal">
+        <h3>SYSTEM FEEDBACK</h3>
+        <div class="stars" id="star-container">
+            <span class="star" onclick="setStar(1)">★</span>
+            <span class="star" onclick="setStar(2)">★</span>
+            <span class="star" onclick="setStar(3)">★</span>
+            <span class="star" onclick="setStar(4)">★</span>
+            <span class="star" onclick="setStar(5)">★</span>
+        </div>
+        <button class="auth-btn" onclick="closeRating()">CLOSE</button>
+    </div>
+
+    <script>
+        const PUBLIC_KEY = "yVzqOuuD7h5ncFFRE";
+        (function(){ emailjs.init(PUBLIC_KEY); })();
+
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12;
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            document.getElementById('clock').innerText = hours + ':' + minutes + ampm;
+            document.getElementById('date').innerText = now.toDateString().toUpperCase();
+        }
+
+        function toggleTheme() {
+            const body = document.getElementById('main-body');
+            body.classList.toggle('day-mode');
+            const isDay = body.classList.contains('day-mode');
+            localStorage.setItem('os_theme', isDay ? 'day' : 'dark');
+            updateThemeUI(isDay);
+        }
+
+        function updateThemeUI(isDay) {
+            document.getElementById('theme-toggle').innerText = isDay ? "🌙 DARK MODE" : "☀️ DAY MODE";
+        }
+
+        function switchAuth(mode) {
+            document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
+            document.getElementById('forget-form').style.display = mode === 'forget' ? 'block' : 'none';
+        }
+
+        function handleRegister() {
+            const u = document.getElementById('reg-user').value;
+            const p = document.getElementById('reg-pass').value;
+            if(u && p) {
+                localStorage.setItem('os_user', u);
+                localStorage.setItem('os_pass', p);
+                alert("Identity Created. Please Login.");
+                switchAuth('login');
+            }
+        }
+
+        function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const savedU = localStorage.getItem('os_user');
+            const savedP = localStorage.getItem('os_pass');
+
+            if(u === savedU && p === savedP) {
+                localStorage.setItem('os_session', 'active');
+                localStorage.setItem('last_u', u);
+                localStorage.setItem('last_p', p);
+                enterOS();
+            } else {
+                alert("ACCESS DENIED");
+            }
+        }
+
+        function enterOS() {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('os-content').style.display = 'flex';
+        }
+
+        function handleRecovery() {
+            const u = document.getElementById('recover-user').value;
+            const savedU = localStorage.getItem('os_user');
+            const savedP = localStorage.getItem('os_pass');
+            if(u === savedU) {
+                alert("KEY RECOVERED: " + savedP);
+                switchAuth('login');
+            } else {
+                alert("Username not found.");
+            }
+        }
+
+        function updateProfileImg(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const url = reader.result;
+                document.getElementById('userAvatar').src = url;
+                localStorage.setItem('os_avatar', url);
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function logout() { 
+            localStorage.removeItem('os_session');
+            location.reload(); 
+        }
+
+        function toggleDropdown() {
+            const dd = document.getElementById('profileDropdown');
+            dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const q = document.getElementById('searchInput').value;
+            if(q) window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_self");
+        }
+
+        function showRating() { 
+            document.getElementById('rating-modal').style.display = 'block'; 
+            toggleDropdown();
+        }
+        function closeRating() { document.getElementById('rating-modal').style.display = 'none'; }
+        
+        function setStar(num) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((s, i) => s.classList.toggle('active', i < num));
+            emailjs.send("service_gq0a72l", "template_z7lz55m", {
+                to_name: "Anurag",
+                rating_value: num,
+                user_name: localStorage.getItem('os_user')
+            });
+            alert("Rating Sent!");
+            closeRating();
+        }
+
+        window.onload = () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            if(localStorage.getItem('os_session') === 'active') enterOS();
+            const savedTheme = localStorage.getItem('os_theme');
+            if(savedTheme === 'day') {
+                document.getElementById('main-body').classList.add('day-mode');
+                updateThemeUI(true);
+            }
+            document.getElementById('login-user').value = localStorage.getItem('last_u') || "";
+            document.getElementById('login-pass').value = localStorage.getItem('last_p') || "";
+            const savedImg = localStorage.getItem('os_avatar');
+            if(savedImg) document.getElementById('userAvatar').src = savedImg;
+        };
+
+        window.onclick = (e) => {
+            if (!e.target.closest('.profile-area')) document.getElementById('profileDropdown').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
