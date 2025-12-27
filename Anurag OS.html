@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Anurag OS | Secure</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CCHE1ZKQX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CCHE1ZKQX');
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
@@ -11,7 +20,7 @@
         :root { 
             --primary: #00f2ff; 
             --bg-filter: brightness(0.5) contrast(1.2); 
-            --dropdown-bg: rgba(0, 0, 0, 0.95);
+            --dropdown-bg: rgba(0, 0, 0, 0.9);
             --text-color: #ffffff;
             --bg-url: url('https://wallpapercave.com/wp/wp2752752.jpg');
         }
@@ -19,7 +28,7 @@
         body.day-mode { 
             --primary: #0066ff; 
             --bg-filter: brightness(1.1) grayscale(0.2); 
-            --dropdown-bg: rgba(255, 255, 255, 0.98);
+            --dropdown-bg: rgba(255, 255, 255, 0.95);
             --text-color: #000000;
             --bg-url: url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=2070&auto=format&fit=crop');
         }
@@ -27,181 +36,193 @@
         body { 
             margin: 0; padding: 0; width: 100vw; height: 100vh; 
             background: #000; font-family: 'Orbitron', sans-serif; 
-            overflow: hidden; color: var(--text-color); 
-            transition: background 0.8s ease, color 0.8s ease;
-            display: flex; flex-direction: column;
+            overflow: hidden; color: var(--text-color); transition: 0.5s ease;
         }
 
-        @keyframes systemFadeIn {
-            from { opacity: 0; transform: scale(1.05); filter: blur(10px); }
-            to { opacity: 1; transform: scale(1); filter: blur(0); }
-        }
-
+        /* --- AUTH SCREENS --- */
         #auth-overlay {
             position: fixed; inset: 0; z-index: 9000;
             background: var(--bg-url) center/cover;
-            display: flex; justify-content: center; align-items: center; 
-            backdrop-filter: blur(10px);
-            transition: 0.8s ease-in-out; padding: 20px;
+            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px);
+            transition: background 0.5s ease;
         }
 
         .auth-card {
-            background: rgba(0, 0, 0, 0.85); padding: 30px; border-radius: 15px;
-            border: 1px solid var(--primary); width: 100%; max-width: 350px; 
-            text-align: center; box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            background: rgba(0, 0, 0, 0.8); padding: 40px; border-radius: 15px;
+            border: 1px solid var(--primary); width: 320px; text-align: center;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
         }
 
-        .auth-card input, .feedback-input {
-            width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px;
+        body.day-mode .auth-card { background: rgba(255, 255, 255, 0.9); border-color: #0066ff; }
+        .auth-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 18px; }
+        .auth-card input {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px;
             border: 1px solid #333; background: rgba(255,255,255,0.05);
             color: var(--text-color); font-family: 'Orbitron'; box-sizing: border-box;
-            font-size: 14px; transition: 0.3s; outline: none;
         }
-        
-        .feedback-input { height: 100px; resize: none; margin-top: 20px; color: var(--text-color) !important; }
 
         .auth-btn {
-            width: 100%; padding: 14px; background: var(--primary); color: white;
-            border: none; border-radius: 8px; cursor: pointer; font-family: 'Orbitron';
+            width: 100%; padding: 12px; background: var(--primary); color: white;
+            border: none; border-radius: 5px; cursor: pointer; font-family: 'Orbitron';
             font-weight: bold; margin-top: 10px; transition: 0.3s;
         }
-
-        .auth-link { cursor: pointer; font-size: 11px; margin-top: 12px; display: inline-block; color: var(--primary); }
-
-        #os-content { display: none; flex: 1; flex-direction: column; animation: systemFadeIn 1s ease; }
         
+        .auth-btn:hover { box-shadow: 0 0 15px var(--primary); transform: translateY(-2px); }
+        .auth-link { font-size: 10px; margin-top: 15px; cursor: pointer; color: var(--primary); display: block; }
+
+        /* --- OS INTERFACE --- */
+        #os-content { display: none; height: 100vh; flex-direction: column; }
         .bg-layer { 
             position: fixed; inset: 0; 
             background: var(--bg-url) center/cover; 
-            filter: var(--bg-filter); 
-            z-index: -1; 
-            transition: background 1s ease, filter 1s ease;
+            filter: var(--bg-filter); z-index: -1; transition: 1s ease;
         }
 
-        nav { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); cursor: pointer; }
+        nav { 
+            height: 70px; display: flex; justify-content: space-between; 
+            align-items: center; padding: 0 25px; z-index: 5000; 
+        }
+
+        .avatar { 
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); 
+            cursor: pointer; object-fit: cover; background: #222;
+        }
 
         #home-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #clock { font-size: clamp(3rem, 15vw, 6rem); color: var(--primary); transition: 0.5s; }
+        #clock { font-size: 80px; font-weight: 700; color: var(--primary); text-shadow: 0 0 10px rgba(0,242,255,0.3); }
+        #date { letter-spacing: 5px; opacity: 0.8; }
         
         .search-box { 
-            width: 90%; max-width: 600px; padding: 15px 25px; border-radius: 50px; 
-            background: rgba(0, 0, 0, 0.5); border: 1px solid var(--primary); 
-            color: white; text-align: center; font-family: 'Orbitron'; outline: none; transition: 0.5s;
+            width: 90%; max-width: 500px; padding: 18px; border-radius: 50px; 
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--primary); 
+            color: white; text-align: center; margin-top: 40px; outline: none; font-family: 'Orbitron';
+            backdrop-filter: blur(5px);
         }
 
+        body.day-mode .search-box { background: rgba(255,255,255,0.7); color: black; }
+
         .profile-dropdown { 
-            position: absolute; top: 75px; right: 20px; background: var(--dropdown-bg); 
-            border: 1px solid var(--primary); border-radius: 12px; width: 250px; 
-            display: none; flex-direction: column; z-index: 1000; transition: 0.3s;
+            position: absolute; top: 60px; right: 25px; background: var(--dropdown-bg); 
+            border: 1px solid var(--primary); border-radius: 8px; width: 220px; display: none; flex-direction: column; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
         }
+        .dropdown-item { padding: 15px; font-size: 11px; cursor: pointer; border-bottom: 1px solid rgba(128,128,128,0.2); }
+        .dropdown-item:hover { background: var(--primary); color: white; }
 
         #rating-modal {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: var(--dropdown-bg); border: 2px solid var(--primary); padding: 25px; 
-            display: none; text-align: center; z-index: 9999; border-radius: 20px; width: 90%; max-width: 400px;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
+            background: var(--dropdown-bg); border: 2px solid var(--primary); padding: 30px; 
+            display: none; text-align: center; z-index: 9999; border-radius: 15px; backdrop-filter: blur(10px);
         }
-
-        .star { font-size: 35px; color: #444; cursor: pointer; transition: 0.2s; }
+        .stars { font-size: 30px; cursor: pointer; color: #444; margin: 15px 0; }
         .star.active { color: #ff00f2; text-shadow: 0 0 10px #ff00f2; }
-
-        .shutdown-active { filter: brightness(0) blur(20px); transform: scale(0.9); pointer-events: none; transition: 1s; }
     </style>
 </head>
 <body id="main-body">
 
     <div id="auth-overlay">
         <div id="login-form" class="auth-card">
-            <h2 style="color:var(--primary)">SYSTEM ACCESS</h2>
-            <form onsubmit="event.preventDefault(); handleLogin();" autocomplete="off">
-                <input type="text" id="login-user" placeholder="USERNAME" required autocomplete="one-time-code">
-                <input type="password" id="login-pass" placeholder="PASSWORD" required autocomplete="one-time-code">
-                <button type="submit" class="auth-btn">AUTHORIZE</button>
-            </form>
-            <div style="display:flex; justify-content: space-between;">
-                <span class="auth-link" onclick="switchAuth('register')">NEW USER?</span>
-                <span class="auth-link" onclick="switchAuth('forgot')">FORGOT?</span>
-            </div>
+            <h2>SYSTEM ACCESS</h2>
+            <input type="text" id="login-user" placeholder="USERNAME">
+            <input type="password" id="login-pass" placeholder="PASSWORD">
+            <button class="auth-btn" onclick="handleLogin()">LOGIN</button>
+            <span class="auth-link" onclick="switchAuth('register')">NEW PILOT? REGISTER</span>
+            <span class="auth-link" onclick="switchAuth('forget')">FORGOT ACCESS CODE?</span>
         </div>
 
         <div id="register-form" class="auth-card" style="display:none;">
-            <h2 style="color:var(--primary)">NEW USER</h2>
-            <form onsubmit="event.preventDefault(); handleRegister();" autocomplete="off">
-                <input type="text" id="reg-user" placeholder="CREATE USERNAME" required autocomplete="new-password">
-                <input type="password" id="reg-pass" placeholder="CREATE PASSWORD" required autocomplete="new-password">
-                <button type="submit" class="auth-btn">REGISTER</button>
-            </form>
-            <span class="auth-link" onclick="switchAuth('login')">BACK</span>
+            <h2>SECURE REGISTRATION</h2>
+            <input type="text" id="reg-user" placeholder="CREATE USERNAME">
+            <input type="password" id="reg-pass" placeholder="CREATE PASSWORD">
+            <button class="auth-btn" onclick="handleRegister()">CREATE IDENTITY</button>
+            <span class="auth-link" onclick="switchAuth('login')">ALREADY HAVE ACCESS?</span>
         </div>
 
-        <div id="forgot-form" class="auth-card" style="display:none;">
-            <h2 style="color:var(--primary)">RECOVERY</h2>
-            <input type="text" id="forgot-user" placeholder="USERNAME" autocomplete="off">
-            <button class="auth-btn" onclick="handleForgot()">RECOVER</button>
-            <span class="auth-link" onclick="switchAuth('login')">BACK</span>
+        <div id="forget-form" class="auth-card" style="display:none;">
+            <h2>RECOVERY MODE</h2>
+            <p style="font-size: 10px; opacity: 0.7;">Enter Username to see password</p>
+            <input type="text" id="recover-user" placeholder="USERNAME">
+            <button class="auth-btn" onclick="handleRecovery()">RECOVER</button>
+            <span class="auth-link" onclick="switchAuth('login')">BACK TO LOGIN</span>
         </div>
     </div>
 
     <div id="os-content">
         <div class="bg-layer"></div>
         <nav>
-            <div class="logo" style="color:var(--primary); font-weight:bold;">ANURAG OS</div>
+            <div class="logo" style="color:var(--primary); font-weight:bold; letter-spacing: 2px;">ANURAG OS</div>
             <div class="profile-area">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="avatar" onclick="toggleDropdown()">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" id="userAvatar" class="avatar" onclick="toggleDropdown()">
+                <input type="file" id="avatarInput" style="display:none" accept="image/*" onchange="updateProfileImg(event)">
                 <div id="profileDropdown" class="profile-dropdown">
-                    <div style="padding:15px; border-bottom: 1px solid var(--primary);">ID: <span id="display-username" style="color: var(--primary);">GUEST</span></div>
-                    <div onclick="toggleTheme()" id="themeBtnText" style="padding:15px; cursor:pointer;">☀️ DAY MODE</div>
-                    <div onclick="showRating()" style="padding:15px; cursor:pointer;">⭐ FEEDBACK</div>
-                    <div onclick="logout()" style="padding:15px; cursor:pointer; color: #ff4b4b;">🚪 LOGOUT</div>
+                    <div style="padding:10px; font-size:9px; border-bottom:1px solid gray; opacity:0.6;">STREAM: G-1CCHE1ZKQX</div>
+                    <div class="dropdown-item" id="theme-toggle" onclick="toggleTheme()">☀️ DAY MODE</div>
+                    <div class="dropdown-item" onclick="document.getElementById('avatarInput').click()">📷 CHANGE PHOTO</div>
+                    <div class="dropdown-item" onclick="showRating()">⭐ RATE EXPERIENCE</div>
+                    <div class="dropdown-item" onclick="logout()" style="color: #ff4b4b;">🚪 LOGOUT</div>
                 </div>
             </div>
         </nav>
 
         <div id="home-screen">
-            <div id="clock">00:00</div>
+            <div id="clock">00:00pm</div>
             <div id="date">LOADING...</div>
-            <form onsubmit="handleSearch(event)" style="width:100%; display:flex; justify-content:center; margin-top:20px;">
-                <input type="text" id="searchInput" class="search-box" placeholder="Search Neural Net...">
+            <form onsubmit="handleSearch(event)">
+                <input type="text" id="searchInput" class="search-box" placeholder="HOLO-SEARCH ACTIVE...">
             </form>
         </div>
     </div>
 
     <div id="rating-modal">
-        <h3 style="color:var(--primary); margin-bottom:5px;">Rate Experience</h3>
-        <p style="font-size:11px; color:gray; margin-bottom:15px;">Tell others what you think</p>
-        <div id="star-container">
+        <h3>SYSTEM FEEDBACK</h3>
+        <div class="stars" id="star-container">
             <span class="star" onclick="setStar(1)">★</span>
             <span class="star" onclick="setStar(2)">★</span>
             <span class="star" onclick="setStar(3)">★</span>
             <span class="star" onclick="setStar(4)">★</span>
             <span class="star" onclick="setStar(5)">★</span>
         </div>
-        <textarea id="feedback-text" class="feedback-input" placeholder="Describe your experience or report bugs..."></textarea>
-        <button class="auth-btn" id="submit-feedback-btn" onclick="submitFeedback()">POST FEEDBACK</button>
-        <p class="auth-link" onclick="closeRating()" style="margin-top:15px; display:block;">NOT NOW</p>
+        <button class="auth-btn" onclick="closeRating()">CLOSE</button>
     </div>
 
     <script>
         const PUBLIC_KEY = "yVzqOuuD7h5ncFFRE";
-        const TEMPLATE_ID = "template_2ueoqrd";
-        const SERVICE_ID = "service_gq0a72l";
-        let currentRating = 0;
-
         (function(){ emailjs.init(PUBLIC_KEY); })();
 
-        function handleLogin() {
-            const u = document.getElementById('login-user').value;
-            const p = document.getElementById('login-pass').value;
-            if(u === localStorage.getItem('os_user') && p === localStorage.getItem('os_pass')) {
-                localStorage.setItem('isLoggedIn', 'true');
-                enterSystem();
-            } else { 
-                alert("ACCESS DENIED"); 
-                // Clear inputs on failed login to prevent "stealing"
-                document.getElementById('login-user').value = '';
-                document.getElementById('login-pass').value = '';
-            }
+        // --- TIME LOGIC (UPDATED TO 5:54PM FORMAT) ---
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? 'pm' : 'am';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            
+            const strTime = hours + ':' + minutes + ampm;
+            document.getElementById('clock').innerText = strTime;
+            document.getElementById('date').innerText = now.toDateString().toUpperCase();
+        }
+
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            const body = document.getElementById('main-body');
+            body.classList.toggle('day-mode');
+            const isDay = body.classList.contains('day-mode');
+            localStorage.setItem('os_theme', isDay ? 'day' : 'dark');
+            updateThemeUI(isDay);
+        }
+
+        function updateThemeUI(isDay) {
+            document.getElementById('theme-toggle').innerText = isDay ? "🌙 DARK MODE" : "☀️ DAY MODE";
+        }
+
+        // --- AUTH LOGIC ---
+        function switchAuth(mode) {
+            document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
+            document.getElementById('forgot-form').style.display = mode === 'forget' ? 'block' : 'none';
         }
 
         function handleRegister() {
@@ -210,105 +231,99 @@
             if(u && p) {
                 localStorage.setItem('os_user', u);
                 localStorage.setItem('os_pass', p);
-                alert("Identity Registered.");
+                alert("Identity Created. Please Login.");
                 switchAuth('login');
             }
         }
 
-        function handleForgot() {
-            const u = document.getElementById('forgot-user').value;
-            if(u === localStorage.getItem('os_user')) alert("KEY: " + localStorage.getItem('os_pass'));
-            else alert("UNKNOWN ID");
+        function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const savedU = localStorage.getItem('os_user');
+            const savedP = localStorage.getItem('os_pass');
+
+            if(u === savedU && p === savedP) {
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('os-content').style.display = 'flex';
+                localStorage.setItem('last_u', u);
+                localStorage.setItem('last_p', p);
+            } else {
+                alert("ACCESS DENIED");
+            }
         }
 
-        function enterSystem() {
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('os-content').style.display = 'flex';
-            document.getElementById('display-username').innerText = (localStorage.getItem('os_user') || "GUEST").toUpperCase();
+        function handleRecovery() {
+            const u = document.getElementById('recover-user').value;
+            const savedU = localStorage.getItem('os_user');
+            const savedP = localStorage.getItem('os_pass');
+            if(u === savedU) {
+                alert("KEY RECOVERED: " + savedP);
+                switchAuth('login');
+            } else {
+                alert("Username not found.");
+            }
         }
 
-        function switchAuth(mode) {
-            document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
-            document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
-            document.getElementById('forgot-form').style.display = mode === 'forgot' ? 'block' : 'none';
-            // Clear inputs when switching forms
-            const inputs = document.querySelectorAll('.auth-card input');
-            inputs.forEach(i => i.value = '');
+        function updateProfileImg(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const url = reader.result;
+                document.getElementById('userAvatar').src = url;
+                localStorage.setItem('os_avatar', url);
+            }
+            reader.readAsDataURL(event.target.files[0]);
         }
 
+        function logout() { location.reload(); }
+
+        function toggleDropdown() {
+            const dd = document.getElementById('profileDropdown');
+            dd.style.display = dd.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const q = document.getElementById('searchInput').value;
+            if(q) window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_self");
+        }
+
+        function showRating() { 
+            document.getElementById('rating-modal').style.display = 'block'; 
+            toggleDropdown();
+        }
+        function closeRating() { document.getElementById('rating-modal').style.display = 'none'; }
+        
         function setStar(num) {
-            currentRating = num;
             const stars = document.querySelectorAll('.star');
-            stars.forEach((s, i) => {
-                if(i < num) s.classList.add('active');
-                else s.classList.remove('active');
+            stars.forEach((s, i) => s.classList.toggle('active', i < num));
+            emailjs.send("service_gq0a72l", "template_z7lz55m", {
+                to_name: "Anurag",
+                rating_value: num,
+                user_name: localStorage.getItem('os_user')
             });
-        }
-
-        function submitFeedback() {
-            const msg = document.getElementById('feedback-text').value;
-            const btn = document.getElementById('submit-feedback-btn');
-            if(currentRating === 0) { alert("Please select a star rating."); return; }
-            btn.innerText = "POSTING...";
-            btn.disabled = true;
-            emailjs.send(SERVICE_ID, TEMPLATE_ID, {
-                user_name: localStorage.getItem('os_user') || "Guest",
-                rating_value: currentRating + " Stars",
-                message: msg || "No comment provided."
-            }).then(() => {
-                alert("Feedback Posted Successfully!");
-                closeRating();
-            }).finally(() => {
-                btn.innerText = "POST FEEDBACK";
-                btn.disabled = false;
-            });
-        }
-
-        function showRating() { document.getElementById('rating-modal').style.display = 'block'; }
-        function closeRating() { 
-            document.getElementById('rating-modal').style.display = 'none'; 
-            currentRating = 0;
-            document.getElementById('feedback-text').value = "";
-            setStar(0);
-        }
-
-        function logout() { 
-            document.body.classList.add('shutdown-active');
-            localStorage.removeItem('isLoggedIn');
-            // Clear all sensitive inputs on logout
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(i => i.value = '');
-            setTimeout(() => { location.reload(); }, 1000); 
-        }
-
-        function toggleDropdown() { 
-            const d = document.getElementById('profileDropdown');
-            d.style.display = d.style.display === 'flex' ? 'none' : 'flex'; 
-        }
-
-        function toggleTheme() { 
-            document.body.classList.toggle('day-mode'); 
-            const isDay = document.body.classList.contains('day-mode');
-            document.getElementById('themeBtnText').innerText = isDay ? "🌙 DARK MODE" : "☀️ DAY MODE";
-        }
-
-        function handleSearch(e) { e.preventDefault(); window.open("https://google.com/search?q=" + document.getElementById('searchInput').value, "_self"); }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-            document.getElementById('date').innerText = now.toDateString().toUpperCase();
+            alert("Rating Sent!");
+            closeRating();
         }
 
         window.onload = () => {
-            setInterval(updateClock, 1000); updateClock();
-            if(localStorage.getItem('isLoggedIn') === 'true') enterSystem();
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            const savedTheme = localStorage.getItem('os_theme');
+            if(savedTheme === 'day') {
+                document.getElementById('main-body').classList.add('day-mode');
+                updateThemeUI(true);
+            }
+
+            document.getElementById('login-user').value = localStorage.getItem('last_u') || "";
+            document.getElementById('login-pass').value = localStorage.getItem('last_p') || "";
+            
+            const savedImg = localStorage.getItem('os_avatar');
+            if(savedImg) document.getElementById('userAvatar').src = savedImg;
         };
 
-        window.onclick = function(event) {
-            if (!event.target.matches('.avatar')) {
-                document.getElementById('profileDropdown').style.display = "none";
-            }
+        window.onclick = (e) => {
+            if (!e.target.closest('.profile-area')) document.getElementById('profileDropdown').style.display = 'none';
         }
     </script>
 </body>
