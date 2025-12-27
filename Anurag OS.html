@@ -83,9 +83,21 @@
             align-items: center; padding: 0 25px; z-index: 5000; 
         }
 
+        /* --- 3D PROFILE EFFECT --- */
+        .profile-area {
+            perspective: 1000px; /* Essential for 3D */
+        }
+
         .avatar { 
-            width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); 
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary); 
             cursor: pointer; object-fit: cover; background: #222;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .avatar:hover {
+            transform: scale(1.3) rotateX(15deg) rotateY(-15deg) translateZ(30px);
+            box-shadow: 0 15px 25px rgba(0, 242, 255, 0.4), 0 0 15px var(--primary);
         }
 
         #home-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -102,7 +114,7 @@
         body.day-mode .search-box { background: rgba(255,255,255,0.7); color: black; }
 
         .profile-dropdown { 
-            position: absolute; top: 60px; right: 25px; background: var(--dropdown-bg); 
+            position: absolute; top: 70px; right: 25px; background: var(--dropdown-bg); 
             border: 1px solid var(--primary); border-radius: 8px; width: 220px; display: none; flex-direction: column; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;
         }
@@ -189,23 +201,17 @@
         const PUBLIC_KEY = "yVzqOuuD7h5ncFFRE";
         (function(){ emailjs.init(PUBLIC_KEY); })();
 
-        // --- TIME LOGIC (UPDATED TO 5:54PM FORMAT) ---
         function updateClock() {
             const now = new Date();
             let hours = now.getHours();
             let minutes = now.getMinutes();
             let ampm = hours >= 12 ? 'pm' : 'am';
-            
-            hours = hours % 12;
-            hours = hours ? hours : 12; // the hour '0' should be '12'
+            hours = hours % 12 || 12;
             minutes = minutes < 10 ? '0'+minutes : minutes;
-            
-            const strTime = hours + ':' + minutes + ampm;
-            document.getElementById('clock').innerText = strTime;
+            document.getElementById('clock').innerText = hours + ':' + minutes + ampm;
             document.getElementById('date').innerText = now.toDateString().toUpperCase();
         }
 
-        // --- THEME LOGIC ---
         function toggleTheme() {
             const body = document.getElementById('main-body');
             body.classList.toggle('day-mode');
@@ -218,11 +224,10 @@
             document.getElementById('theme-toggle').innerText = isDay ? "🌙 DARK MODE" : "☀️ DAY MODE";
         }
 
-        // --- AUTH LOGIC ---
         function switchAuth(mode) {
             document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
             document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
-            document.getElementById('forgot-form').style.display = mode === 'forget' ? 'block' : 'none';
+            document.getElementById('forget-form').style.display = mode === 'forget' ? 'block' : 'none';
         }
 
         function handleRegister() {
@@ -243,13 +248,18 @@
             const savedP = localStorage.getItem('os_pass');
 
             if(u === savedU && p === savedP) {
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('os-content').style.display = 'flex';
+                localStorage.setItem('os_session', 'active');
                 localStorage.setItem('last_u', u);
                 localStorage.setItem('last_p', p);
+                enterOS();
             } else {
                 alert("ACCESS DENIED");
             }
+        }
+
+        function enterOS() {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('os-content').style.display = 'flex';
         }
 
         function handleRecovery() {
@@ -274,7 +284,10 @@
             reader.readAsDataURL(event.target.files[0]);
         }
 
-        function logout() { location.reload(); }
+        function logout() { 
+            localStorage.removeItem('os_session');
+            location.reload(); 
+        }
 
         function toggleDropdown() {
             const dd = document.getElementById('profileDropdown');
@@ -308,16 +321,14 @@
         window.onload = () => {
             updateClock();
             setInterval(updateClock, 1000);
-            
+            if(localStorage.getItem('os_session') === 'active') enterOS();
             const savedTheme = localStorage.getItem('os_theme');
             if(savedTheme === 'day') {
                 document.getElementById('main-body').classList.add('day-mode');
                 updateThemeUI(true);
             }
-
             document.getElementById('login-user').value = localStorage.getItem('last_u') || "";
             document.getElementById('login-pass').value = localStorage.getItem('last_p') || "";
-            
             const savedImg = localStorage.getItem('os_avatar');
             if(savedImg) document.getElementById('userAvatar').src = savedImg;
         };
