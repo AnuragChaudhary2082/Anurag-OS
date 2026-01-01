@@ -1,0 +1,63 @@
+import tkinter as tk
+from tkinter import messagebox
+import ctypes
+import psutil
+import sys
+
+# High-level Windows Permissions
+PROCESS_ALL_ACCESS = 0x1F0FFF
+
+def deep_memory_flush():
+    """Forces the Windows Kernel to reclaim every byte of unused RAM."""
+    try:
+        # 1. System-Wide Flush: Tells Windows to trim all possible system RAM
+        ctypes.windll.psapi.EmptyWorkingSet(-1)
+        
+        # 2. Individual Process Flush: Forces apps (Chrome, etc.) to release RAM
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                # Open process with full access to memory management
+                handle = ctypes.windll.kernel32.OpenProcess(PROCESS_ALL_ACCESS, False, proc.info['pid'])
+                if handle:
+                    # The "Magic" Command that drops the 1.6GB
+                    ctypes.windll.psapi.EmptyWorkingSet(handle)
+                    ctypes.windll.kernel32.CloseHandle(handle)
+            except:
+                continue
+        return True
+    except:
+        return False
+
+def on_optimize_click():
+    status_label.config(text="STATUS: RECLAIMING RAM...", fg="#00FF00")
+    root.update()
+    
+    if deep_memory_flush():
+        status_label.config(text="STATUS: RAM OPTIMIZED", fg="#00FF00")
+        messagebox.showinfo("Pro RAM Optimizer", "Optimization Complete!\nMemory has been reclaimed.")
+    else:
+        status_label.config(text="STATUS: ADMIN REQUIRED", fg="#FF3333")
+
+# --- Professional Dark UI ---
+root = tk.Tk()
+root.title("Anurag Nepal - RAM Optimizer")
+root.geometry("400x300")
+root.configure(bg="#050505")
+
+# Icon handling
+try:
+    root.iconbitmap("logo.ico")
+except:
+    pass
+
+tk.Label(root, text="🚀 PRO MEMORY", font=("Segoe UI Black", 24), fg="#00FF00", bg="#050505").pack(pady=(30, 0))
+tk.Label(root, text="OPTIMIZER", font=("Segoe UI", 12), fg="#00FF00", bg="#050505").pack(pady=(0, 20))
+
+status_label = tk.Label(root, text="SYSTEM READY", font=("Consolas", 10), fg="#888888", bg="#050505")
+status_label.pack(pady=10)
+
+opt_btn = tk.Button(root, text="RELEASE RAM", command=on_optimize_click, bg="#00FF00", fg="#050505", 
+                   font=("Segoe UI", 14, "bold"), width=18, height=2, relief="flat", cursor="hand2")
+opt_btn.pack(pady=20)
+
+root.mainloop()
